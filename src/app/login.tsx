@@ -1,46 +1,47 @@
-import { View, Text, Pressable, Image, TextInput, StyleSheet, Alert} from 'react-native';
+import { View, Text, Pressable, Image, TextInput, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { useState } from 'react';
 import { router } from "expo-router";
 import { loginUser } from '../database/users/users';
 
 const loginPage = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [checked, setChecked] = useState(false);
-    const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [checked, setChecked] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-    const handleSignIn = async () => {
-        const trimnedEmail = email.trim();
-      
-        if (!trimnedEmail || password.trim()) {
-            Alert.alert("Missing Fields", "Please fill in all fields.");
-        }
+  const handleSignIn = async () => {
+    const trimnedEmail = email.trim();
 
-        setLoading(true);
-        try {
-            const user = await loginUser(trimnedEmail, password);
+    if (!trimnedEmail || !password.trim()) {
+      Alert.alert("Missing Fields", "Please fill in all fields.");
+      return;
+    }
 
-            if(!user) {
-              Alert.alert(
-                "Login Failed",
-                "Invalid email or password, Please try again.",
-              );
-              return;
-            }
+    setLoading(true);
+    try {
+      const user = await loginUser(trimnedEmail, password);
 
-            setEmail("");
-            setPassword("");
-            router.push("/home");
-        } catch (error) {
-            console.error("Login error:", error);
-            Alert.alert(
-              "Error",
-              "An unexpected error occurred while logging in. Please try again",
-            );
-        } finally {
-            setLoading(false);
-        }
-    };
+      if (!user) {
+        Alert.alert(
+          "Login Failed",
+          "Invalid email or password, Please try again.",
+        );
+        return;
+      }
+
+      setEmail("");
+      setPassword("");
+      router.push("/home");
+    } catch (error) {
+      console.error("Login error:", error);
+      Alert.alert(
+        "Error",
+        "An unexpected error occurred while logging in. Please try again",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -63,12 +64,12 @@ const loginPage = () => {
           <Text> Email</Text>
           <TextInput
             style={styles.input}
-            // value= {email}
+            value= {email}
             placeholder="Enter your email"
             onChangeText={setEmail}
             keyboardType="email-address"
             onFocus={() => { }}
-            onBlur={() => {}}
+            onBlur={() => { }}
 
           />
         </View>
@@ -76,17 +77,17 @@ const loginPage = () => {
           <Text> Password</Text>
           <TextInput
             style={styles.input}
-            // value={password}
+            value={password}
             placeholder="Enter your password"
             onChangeText={setPassword}
             secureTextEntry
             onFocus={() => { }}
-            onBlur={() => {}}
+            onBlur={() => { }}
           />
         </View>
       </View>
 
-      <View style={styles.formWrapper}>
+      {/* <View style={styles.formWrapper}>
         <Pressable onPress={toggleActivity}>
           <Text style={{
             opacity: 1,
@@ -94,19 +95,25 @@ const loginPage = () => {
           </Text>
         </Pressable>
         <Text>Forget Password ?</Text>
-      </View>
+      </View> */}
 
       <Pressable
         // onPress={()=> {router.push("/register")}}
         onPress={handleSignIn}
-        style={styles.startButton}>
-        <Text style={{
-          textAlign: "center",
-          color: "white",
-          fontSize: 16,
-        }}
-        >
-          Sign In</Text>
+        style={[styles.startButton, loading && styles.buttonDisabled]}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="white" />
+        ) : (
+          <Text style={{
+            textAlign: "center",
+            color: "white",
+            fontSize: 16,
+          }}
+          >
+            Sign In</Text>
+        )}
       </Pressable>
 
       <View style={styles.divider}>
@@ -146,7 +153,7 @@ const loginPage = () => {
         >
           Don't have an account ?
         </Text>
-        <Pressable onPress={() => { router.push("/register") }}>
+        <Pressable onPress={() => { router.push("/home") }}>
           <Text style={{
             color: "#6d63ff"
           }}
@@ -214,6 +221,16 @@ const styles = StyleSheet.create({
     borderRadius: 9999,
     width: "100%",
     marginTop: 20,
+  },
+
+  buttonDisabled: {
+    backgroundColor: "#6d63ff",
+    paddingVertical: 18,
+    paddingHorizontal: 18,
+    borderRadius: 9999,
+    width: "100%",
+    marginTop: 15,
+    textAlign: "center",
   },
 
   divider: {
@@ -316,4 +333,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default login
+export default loginPage

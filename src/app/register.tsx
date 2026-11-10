@@ -65,8 +65,9 @@ const register = () => {
                     <TextInput
                         style={styles.input}
                         placeholder="Enter your username"
-                        onChangeText={() => { setName }}
-                        onFocus={() => {}}
+                        value={name}
+                        onChangeText={setName}
+                        onFocus={() => { }}
 
                     />
                 </View>
@@ -75,8 +76,9 @@ const register = () => {
                     <TextInput
                         style={styles.input}
                         placeholder="Enter your email"
-                        onChangeText={() => { setEmail }}
-                        onFocus={() => {}}
+                        value={email}
+                        onChangeText={setEmail}
+                        onFocus={() => { }}
                     />
                 </View>
                 <View style={styles.inputWrapper}>
@@ -84,8 +86,11 @@ const register = () => {
                     <TextInput
                         style={styles.input}
                         placeholder="Create a password"
-                        onChangeText={() => { setPassword }}
-                        onFocus={() => {}}
+                        value={password}
+                        onChangeText={setPassword}
+                        secureTextEntry
+                        onFocus={() => { }}
+                        onBlur={() => { }}
                     />
                 </View>
             </View>
@@ -106,7 +111,7 @@ const register = () => {
                 onPress={handleSignUp}
                 style={[styles.signUpButton, loading && styles.buttonDisabled]}
                 disabled={loading}
-                >
+            >
                 {loading ? (
                     <ActivityIndicator color="white" />
                 ) : (
@@ -115,7 +120,7 @@ const register = () => {
                         color: "white",
                         fontSize: 16,
                     }}
-                >
+                    >
                         Create Account</Text>
                 )}
             </Pressable>

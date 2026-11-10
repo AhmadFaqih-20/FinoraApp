@@ -46,7 +46,7 @@ export const loginUser = async (
     }
     
     const row = await database.getFirstAsync<User & {password: string}> (
-        `SELECT id, name, email, password FROM users WHERE = ?`,
+        `SELECT id, name, email, password FROM users WHERE email = ?`,
         email.trim(),
     );
 
