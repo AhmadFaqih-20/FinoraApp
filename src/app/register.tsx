@@ -1,26 +1,40 @@
 import { router } from "expo-router";
-import { Image, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useState } from 'react';
+import { Image, Pressable, StyleSheet, Text, TextInput, View, Alert, ActivityIndicator } from 'react-native';
+import { signUp } from "@/database/users/users";
 
 const register = () => {
-    const [fullName, setFullName] = useState("");
+    const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleSignUp = () => { 
-        if (fullName.trim() === "" && email.trim() === "" && password.trim() === "") {
-        } {
-            alert("Nama, Email, Password tidak boleh kosong!");
-            return;
-        } 
-        
-        setFullName("");
-        setEmail("");
-        setPassword("");
-        
-        alert("Berhasil membuat akun!");
-        router.push("/home");
-        
+    const handleSignUp = async () => {
+        if (name.trim() === "" || email.trim() === "" || password.trim() === "") {
+            Alert.alert("Missing Fields", "Please fill in all fields.");
+        }
+
+        setLoading(true);
+        try {
+            await signUp(name, email, password);
+
+            setName(" ");
+            setEmail(" ");
+            setPassword(" ");
+            router.push("/login");
+            Alert.alert(
+                "Success",
+                "Account created successfully! You can now log in.",
+            );
+        } catch (e: any) {
+            Alert.alert(
+                "Sign Up Failed",
+                e.message ?? "Something went wrong. Please try again.",
+            );
+            console.log(e);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -51,9 +65,9 @@ const register = () => {
                     <TextInput
                         style={styles.input}
                         placeholder="Enter your username"
-                        onChangeText={() => {setFullName}}
-                        onFocus={() => { }}
-                        
+                        onChangeText={() => { setName }}
+                        onFocus={() => {}}
+
                     />
                 </View>
                 <View style={styles.inputWrapper}>
@@ -61,8 +75,8 @@ const register = () => {
                     <TextInput
                         style={styles.input}
                         placeholder="Enter your email"
-                        onChangeText={() => {setEmail}}
-                        onFocus={() => { }}
+                        onChangeText={() => { setEmail }}
+                        onFocus={() => {}}
                     />
                 </View>
                 <View style={styles.inputWrapper}>
@@ -70,8 +84,8 @@ const register = () => {
                     <TextInput
                         style={styles.input}
                         placeholder="Create a password"
-                        onChangeText={() => {setPassword}}
-                        onFocus={() => { }}
+                        onChangeText={() => { setPassword }}
+                        onFocus={() => {}}
                     />
                 </View>
             </View>
@@ -90,14 +104,20 @@ const register = () => {
             <Pressable
                 // onPress={()=> {router.push("/register")}}
                 onPress={handleSignUp}
-                style={styles.signUpButton}>
-                <Text style={{
-                    textAlign: "center",
-                    color: "white",
-                    fontSize: 16,
-                }}
+                style={[styles.signUpButton, loading && styles.buttonDisabled]}
+                disabled={loading}
                 >
-                    Create Account</Text>
+                {loading ? (
+                    <ActivityIndicator color="white" />
+                ) : (
+                    <Text style={{
+                        textAlign: "center",
+                        color: "white",
+                        fontSize: 16,
+                    }}
+                >
+                        Create Account</Text>
+                )}
             </Pressable>
 
             <View style={styles.divider}>
@@ -199,6 +219,16 @@ const styles = StyleSheet.create({
     },
 
     signUpButton: {
+        backgroundColor: "#6d63ff",
+        paddingVertical: 18,
+        paddingHorizontal: 18,
+        borderRadius: 9999,
+        width: "100%",
+        marginTop: 15,
+        textAlign: "center",
+    },
+
+    buttonDisabled: {
         backgroundColor: "#6d63ff",
         paddingVertical: 18,
         paddingHorizontal: 18,
@@ -313,6 +343,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 13,
         paddingVertical: 18,
         borderRadius: 15,
+        color: "#000000"
     },
 
 });

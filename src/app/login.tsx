@@ -1,14 +1,47 @@
-import { View, Text, Pressable, Image, TextInput, StyleSheet } from 'react-native';
+import { View, Text, Pressable, Image, TextInput, StyleSheet, Alert} from 'react-native';
 import { useState } from 'react';
 import { router } from "expo-router";
+import { loginUser } from '../database/users/users';
 
-const login = () => {
-  const [activity, setActivity] = useState({ completed: false });
+const loginPage = () => {
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [checked, setChecked] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-  const handleSignIn = () => { router.push("/home") };
-  const toggleActivity = () => {
-    setActivity({ completed: !activity.completed });
-  };
+    const handleSignIn = async () => {
+        const trimnedEmail = email.trim();
+      
+        if (!trimnedEmail || password.trim()) {
+            Alert.alert("Missing Fields", "Please fill in all fields.");
+        }
+
+        setLoading(true);
+        try {
+            const user = await loginUser(trimnedEmail, password);
+
+            if(!user) {
+              Alert.alert(
+                "Login Failed",
+                "Invalid email or password, Please try again.",
+              );
+              return;
+            }
+
+            setEmail("");
+            setPassword("");
+            router.push("/home");
+        } catch (error) {
+            console.error("Login error:", error);
+            Alert.alert(
+              "Error",
+              "An unexpected error occurred while logging in. Please try again",
+            );
+        } finally {
+            setLoading(false);
+        }
+    };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -25,22 +58,42 @@ const login = () => {
           Log in to your account to continue</Text>
       </View>
 
-      <View style={styles.form}>
-        <Text style={styles.label}>Email</Text>
-        <TextInput style={styles.input} placeholder='Enter your email' />
+      <View style={styles.signInForm}>
+        <View style={styles.inputWrapper}>
+          <Text> Email</Text>
+          <TextInput
+            style={styles.input}
+            // value= {email}
+            placeholder="Enter your email"
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            onFocus={() => { }}
+            onBlur={() => {}}
 
-        <Text style={styles.label}>Password</Text>
-        <TextInput style={styles.input} placeholder='Enter your password' />
+          />
+        </View>
+        <View style={styles.inputWrapper}>
+          <Text> Password</Text>
+          <TextInput
+            style={styles.input}
+            // value={password}
+            placeholder="Enter your password"
+            onChangeText={setPassword}
+            secureTextEntry
+            onFocus={() => { }}
+            onBlur={() => {}}
+          />
+        </View>
       </View>
 
-      <View style={styles.form}>
+      <View style={styles.formWrapper}>
         <Pressable onPress={toggleActivity}>
-          <Text>{activity.completed ? "☑" : "☐"} <Text style={{
-            opacity: 0.5,
-          }}>Remember me</Text>
-            Forget Password ?
+          <Text style={{
+            opacity: 1,
+          }}>{activity.completed ? "☑" : "☐"} Remember me
           </Text>
         </Pressable>
+        <Text>Forget Password ?</Text>
       </View>
 
       <Pressable
@@ -93,12 +146,12 @@ const login = () => {
         >
           Don't have an account ?
         </Text>
-        <Pressable onPress={() => { router.push("/login") }}>
+        <Pressable onPress={() => { router.push("/register") }}>
           <Text style={{
             color: "#6d63ff"
           }}
           >
-            Sign In
+            Sign Up
           </Text>
         </Pressable>
 
@@ -218,6 +271,23 @@ const styles = StyleSheet.create({
   form: {
     width: "100%",
     marginTop: 10,
+    display: "flex",
+  },
+
+  formWrapper: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginTop: 10,
+  },
+
+  signInForm: {
+    width: "100%",
+    display: "flex",
+    flexDirection: "column",
+    gap: 15,
+    marginTop: 30,
   },
 
   label: {
@@ -227,16 +297,22 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
 
+  inputWrapper: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+    width: "100%",
+  },
+
   input: {
     width: "100%",
-    height: 50,
     borderWidth: 1,
-    borderColor: "#e5e5e5",
-    borderRadius: 5,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    opacity: 0.5,
-  }
+    borderColor: "#3333337d",
+    paddingHorizontal: 13,
+    paddingVertical: 18,
+    borderRadius: 15,
+    color: "#000000",
+  },
 
 });
 
