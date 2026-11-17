@@ -153,7 +153,7 @@ const loginPage = () => {
         >
           Don't have an account ?
         </Text>
-        <Pressable onPress={() => { router.push("/home") }}>
+        <Pressable onPress={() => { router.push("/register") }}>
           <Text style={{
             color: "#6d63ff"
           }}
